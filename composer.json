@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "inmanturbo/teams": "*",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9"
     },
@@ -74,9 +75,9 @@
     "repositories": {
         "mod": {
             "type": "path",
-            "url": "../*",
+            "url": "mod/*",
             "options": {
-                "symlink": false
+                "symlink": true
             }
         }
     }

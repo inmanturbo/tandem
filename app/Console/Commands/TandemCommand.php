@@ -6,9 +6,12 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
+use Inmanturbo\Tandem\Concerns\InstallsStubs;
 
 class TandemCommand extends Command
 {
+    use InstallsStubs;
+
     protected $signature = 'tandem {mod} {vendor} {namespace} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
 
     protected $description = 'Sets up a new Laravel module with the specified namespace and vendor.';
@@ -123,30 +126,5 @@ class TandemCommand extends Command
         $moduleName = $this->argument('mod');
 
         return realpath($path = "mod/{$moduleName}");
-    }
-
-    protected function copyFiles()
-    {
-        $this->info('Copying files...');
-
-        $sourceDir = $this->stubPath();
-        $destinationDir = $this->buildPath();
-
-        if (! File::exists($sourceDir)) {
-            $this->info('No files to copy!');
-            return;
-        }
-
-        $files = File::allFiles($sourceDir, true);
-
-        foreach ($files as $file) {
-            $destinationFilePath = $destinationDir.'/'.$file->getRelativePathname();
-            File::ensureDirectoryExists(dirname($destinationFilePath));
-            File::copy($sourceFile = $file->getPathname(), $destinationFilePath);
-
-            if ($this->output->isVerbose()) {
-                $this->line('<info>Copied</info> '.$sourceFile.' <info>to</info> '.$destinationFilePath);
-            }
-        }
     }
 }

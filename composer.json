@@ -1,7 +1,7 @@
 {
     "name": "inmanturbo/tandem",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "Run laravel apps in tandem.",
     "keywords": [
         "laravel",
         "framework"

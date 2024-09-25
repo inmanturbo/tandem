@@ -28,7 +28,7 @@ Example:
 php artisan tandem teams Inmanturbo Teams --init --install
 ```
 
-The above example Will create a directory called mod and install a laravel app into a folder called teams inside of it, renaming the App and Database namespaces to `Inmanturbo\Teams` and `Inmanturbo\Teams\Database`, respectively.
+The above example will create a directory called mod and install a laravel app into a folder called teams inside of it, renaming the App and Database namespaces to `Inmanturbo\Teams` and `Inmanturbo\Teams\Database`, respectively.
 
 Also will update composer.json to reflect namespace, and add `Inmanturbo\Teams\Providers\AppServiceProvider` to the `extras.laravel.providers` array.
 
@@ -36,4 +36,4 @@ Additionally, any stub files found within `base_path('stubs/mod')` will be copie
 
 Lastly, it will add a local repository to your main app's composer.json at the path `mod/*`, and install the package into you app using a symlink.
 
-You will be able to use your package as a project and/or package, and run and use artisan commands from within the package during development.
+You will be able to use your package as a project and/or package, and use artisan commands from within the package during development.

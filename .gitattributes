@@ -1,0 +1,21 @@
+* text=auto eol=lf
+
+*.blade.php diff=html
+*.css diff=css
+*.html diff=html
+*.md diff=markdown
+*.php diff=php
+
+/.github export-ignore
+CHANGELOG.md export-ignore
+.styleci.yml export-ignore
+/bootstrap export-ignore
+/config export-ignore
+/database export-ignore
+/public export-ignore
+/resources export-ignore
+/routes export-ignore
+/storage export-ignore
+/tests export-ignore
+/app/Http export-ignore
+/app/Models export-ignore

@@ -12,7 +12,7 @@ class TandemCommand extends Command
 {
     use InstallsStubs;
 
-    protected $signature = 'tandem {mod} {vendor} {namespace} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
+    protected $signature = 'tandem {mod?} {vendor?} {namespace?} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
 
     protected $description = 'Sets up a new Laravel module with the specified namespace and vendor.';
 
@@ -30,6 +30,16 @@ class TandemCommand extends Command
 
         if ($this->option('init')) {
             Process::run("composer config repositories.mod '{\"type\": \"path\", \"url\": \"mod/*\", \"options\": {\"symlink\": true}}' --file composer.json && composer config minimum-stability 'dev'");
+
+            $this->info('mod repository initialized');
+        }
+
+        if (! $this->argument('mod') || ! $this->argument('vendor') || ! $this->argument('namespace')) {
+            if (! $this->option('init')) {
+                $this->error('Please provide mod, vendor and namespace to create mod, or use --init option to initialize');
+            }
+
+            return 0;
         }
 
         if (! File::exists($path)) {

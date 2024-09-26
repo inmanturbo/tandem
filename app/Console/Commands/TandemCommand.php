@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Inmanturbo\Tandem\Concerns\InstallsStubs;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class TandemCommand extends Command
 {
@@ -29,9 +31,7 @@ class TandemCommand extends Command
         }
 
         if ($this->option('init')) {
-            Process::run("composer config repositories.mod '{\"type\": \"path\", \"url\": \"mod/*\", \"options\": {\"symlink\": true}}' --file composer.json && composer config minimum-stability 'dev'");
-
-            $this->info('mod repository initialized');
+            $this->initializeModRepository();
         }
 
         if (! $this->argument('mod') || ! $this->argument('vendor') || ! $this->argument('namespace')) {
@@ -56,7 +56,7 @@ class TandemCommand extends Command
             }
         }
 
-        $this->copyFiles();
+        $this->installStubs();
 
         $phpFiles = File::allFiles($path, true);
         foreach ($phpFiles as $file) {
@@ -136,5 +136,34 @@ class TandemCommand extends Command
         $moduleName = $this->argument('mod');
 
         return realpath($path = "mod/{$moduleName}");
+    }
+
+    protected function initializeModRepository(): void
+    {
+        Process::run([
+            'composer', 
+            'config', 
+            'repositories.mod', 
+            $repositoryConfig = json_encode([
+                'type' => 'path',
+                'url' => 'mod/*',
+                'options' => ['symlink' => true]
+            ]),
+            '--file', 
+            'composer.json'
+        ], function ($type, $buffer) {
+            $this->output->write($buffer);
+        });
+        
+        Process::run([
+            'composer',
+            'config', 
+            'minimum-stability', 
+            'dev'
+        ], function ($type, $buffer) {
+            $this->output->write($buffer);
+        });
+
+        $this->info('mod repository initialized');
     }
 }

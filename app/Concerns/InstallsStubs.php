@@ -10,7 +10,7 @@ trait InstallsStubs
 
     abstract protected function buildPath();
 
-    protected function copyFiles()
+    protected function installStubs()
     {
         $this->info('Copying files...');
 

@@ -6,26 +6,34 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
+use Inmanturbo\Tandem\Concerns\ReplacesFileContent;
 use Inmanturbo\Tandem\Concerns\InstallsStubs;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Inmanturbo\Tandem\ReplaceNamespaceApp;
+use Inmanturbo\Tandem\ReplaceUseApp;
+use Inmanturbo\Tandem\ReplaceUseDatabase;
+
+use function Illuminate\Filesystem\join_paths;
 
 class TandemCommand extends Command
 {
     use InstallsStubs;
+    use ReplacesFileContent;
 
     protected $signature = 'tandem {mod?} {vendor?} {namespace?} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
 
     protected $description = 'Sets up a new Laravel module with the specified namespace and vendor.';
 
+    protected function findAndReplaceOperations()
+    {
+        return [
+            new ReplaceNamespaceApp($this->fullQualifiedNamespace()),
+            new ReplaceUseDatabase($this->fullQualifiedNamespace()),
+            new ReplaceUseApp($this->fullQualifiedNamespace()),
+        ];
+    }
+
     public function handle(): int
     {
-        $moduleName = $this->argument('mod');
-        $packageVendor = $this->argument('vendor');
-        $packageNamespace = $this->argument('namespace');
-        $fqns = "{$packageVendor}\\{$packageNamespace}";
-        $path = "mod/{$moduleName}";
-
         if (! File::exists(base_path('mod'))) {
             mkdir(base_path('mod'));
         }
@@ -42,10 +50,14 @@ class TandemCommand extends Command
             return 0;
         }
 
-        if (! File::exists($path)) {
-            $this->info("Creating new Laravel module: {$moduleName}");
+        if (! File::exists($this->modPath())) {
+            $this->info("Creating new Laravel module: {$this->argument('mod')}");
 
-            $process = Process::run("cd mod && laravel new {$moduleName}", function ($type, $buffer): void {
+            $process = Process::path(base_path('mod'))->run([
+                $this->laravel(),
+                'new',
+                $this->argument('mod'),
+            ], function ($type, $buffer): void {
                 $this->output->write($buffer);
             });
 
@@ -57,34 +69,66 @@ class TandemCommand extends Command
         }
 
         $this->installStubs();
+        $this->replaceFileContents($this->buildPath(), ...$this->findAndReplaceOperations());
 
-        $phpFiles = File::allFiles($path, true);
-        foreach ($phpFiles as $file) {
-            $filePath = $file->getRealPath();
-            $this->replaceNamespace($filePath, $packageVendor, $packageNamespace);
-        }
+        // $phpFiles = File::allFiles($this->modPath(), true);
+        // foreach ($phpFiles as $file) {
+        //     $filePath = $file->getRealPath();
+        //     $this->replaceAppNamespace($filePath, $this->fullQualifiedNamespace());
+        // }
 
-        $packageName = Str::of($packageVendor)->kebab()->lower()->__toString()
-            .'/'
-            .Str::of($packageNamespace)->kebab()->lower()->__toString();
-
-        $this->updateComposerJson($path, $fqns, $packageName);
+        $this->updateComposerJson($this->composerFile(), $this->fullQualifiedNamespace(), $this->packageName());
 
         $this->info('Running Composer commands...');
-        $process = Process::run("(cd {$path} && composer require --dev rector/rector phpstan/phpstan && composer config repositories.mod '{\"type\": \"path\", \"url\": \"../*\", \"options\": {\"symlink\": false}}' --file composer.json && composer config minimum-stability 'dev')", function ($type, $buffer): void {
-            $this->output->write($buffer);
-        });
 
-        if (! $process->successful()) {
-            $this->error('Failed to run Composer commands.');
+        $commands = [
+            [
+                $this->composer(),
+                'require',
+                '--dev',
+                'rector/rector',
+                'phpstan/phpstan'
+            ],
+            [
+                $this->composer(),
+                'config',
+                'repositories.mod',
+                $repositoryConfig = json_encode([
+                    'type' => 'path',
+                    'url' => '../*',
+                    'options' => ['symlink' => false]
+                ]),
+                '--file', 
+                'composer.json',
+            ],
+            [
+                $this->composer(),
+                'config',
+                'minimum-stability',
+                'dev',
+            ]
+        ];
 
-            return 1;
+        foreach ($commands as $command) {
+            $process = Process::path($this->buildPath())->run($command, function ($type, $buffer): void {
+                $this->output->write($buffer);
+            });
+
+            if (! $process->successful()) {
+                $this->error('Failed to run ' . implode(' ', $command));
+    
+                return 1;
+            }
         }
 
         $this->info('Module setup completed successfully.');
 
         if ($this->option('install')) {
-            Process::run("composer require $packageName:*", function ($type, $buffer): void {
+            Process::run([
+                $this->composer(),
+                'require',
+                "{$this->packageName()}:*"
+            ], function ($type, $buffer): void {
                 $this->output->write($buffer);
             });
         }
@@ -92,38 +136,71 @@ class TandemCommand extends Command
         return 0;
     }
 
-    protected function replaceNamespace($filePath, $packageVendor, $packageNamespace)
+
+    protected function composer():string
+    {
+        return 'composer';
+    }
+
+    protected function laravel():string
+    {
+        return 'laravel';
+    }
+
+    protected function replaceAppNamespace($filePath, $fullyQualifiedNamespace)
     {
         $content = File::get($filePath);
 
-        $content = str_replace('namespace App', "namespace {$packageVendor}\\{$packageNamespace}", $content);
-        $content = str_replace('use App', "use {$packageVendor}\\{$packageNamespace}", $content);
-        $content = str_replace('use Database', "use {$packageVendor}\\{$packageNamespace}\\Database", $content);
-        $content = str_replace(' App\\', " {$packageVendor}\\{$packageNamespace}\\", $content);
-        $content = str_replace('namespace Database\\', "namespace {$packageVendor}\\{$packageNamespace}\\Database\\", $content);
+        $content = str_replace('namespace App', "namespace {$fullyQualifiedNamespace}", $content);
+        $content = str_replace('use App', "use {$fullyQualifiedNamespace}", $content);
+        $content = str_replace('use Database', "use {$fullyQualifiedNamespace}\\Database", $content);
+        $content = str_replace(' App\\', " {$fullyQualifiedNamespace}\\", $content);
+        $content = str_replace('namespace Database\\', "namespace {$fullyQualifiedNamespace}\\Database\\", $content);
 
         File::put($filePath, $content);
     }
 
-    protected function updateComposerJson($path, $fqns, $name)
+    protected function composerFile()
     {
-        $composerJsonPath = "{$path}/composer.json";
-        $composerData = json_decode(File::get($composerJsonPath), true);
+        return join_paths($this->modPath(), 'composer.json');
+    }
+
+    protected function fullQualifiedNamespace(): string
+    {
+        return "{$this->argument('vendor')}\\{$this->argument('namespace')}";
+    }
+
+    protected function packageName(): string
+    {
+        return implode('/', [
+            (string) Str::of($this->argument('vendor'))->kebab()->lower(),
+            (string) Str::of($this->argument('mod'))->kebab()->lower(),
+        ]);
+    }
+
+    protected function updateComposerJson(string $composerFile, string $fullyQualifiedNamespace, string $packageName) : void
+    {
+        $composerData = json_decode(File::get($composerFile), true);
 
         unset($composerData['autoload']['psr-4']);
 
-        $composerData['autoload']['psr-4']["{$fqns}\\Database\\Factories\\"] = 'database/factories/';
-        $composerData['autoload']['psr-4']["{$fqns}\\Database\\Seeders\\"] = 'database/seeders/';
-        $composerData['autoload']['psr-4']["{$fqns}\\"] = 'app/';
+        $composerData['autoload']['psr-4']["{$fullyQualifiedNamespace}\\Database\\Factories\\"] = 'database/factories/';
+        $composerData['autoload']['psr-4']["{$fullyQualifiedNamespace}\\Database\\Seeders\\"] = 'database/seeders/';
+        $composerData['autoload']['psr-4']["{$fullyQualifiedNamespace}\\"] = 'app/';
 
-        $composerData['name'] = $name;
+        $composerData['name'] = $packageName;
 
         if (! isset($composerData['extra']['laravel']['providers'])) {
             $composerData['extra']['laravel']['providers'] = [];
         }
-        $composerData['extra']['laravel']['providers'][] = "{$fqns}\\Providers\\AppServiceProvider";
+        $composerData['extra']['laravel']['providers'][] = "{$fullyQualifiedNamespace}\\Providers\\AppServiceProvider";
 
-        File::put($composerJsonPath, json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        File::put($this->composerFile(), json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
+    protected function modPath(): string
+    {
+        return join_paths(base_path(), 'mod', $this->argument('mod'));
     }
 
     protected function stubPath()
@@ -133,15 +210,13 @@ class TandemCommand extends Command
 
     protected function buildPath()
     {
-        $moduleName = $this->argument('mod');
-
-        return realpath($path = "mod/{$moduleName}");
+        return realpath($this->modPath());
     }
 
     protected function initializeModRepository(): void
     {
         Process::run([
-            'composer', 
+            $this->composer(), 
             'config', 
             'repositories.mod', 
             $repositoryConfig = json_encode([
@@ -151,16 +226,16 @@ class TandemCommand extends Command
             ]),
             '--file', 
             'composer.json'
-        ], function ($type, $buffer) {
+        ], function ($type, $buffer): void {
             $this->output->write($buffer);
         });
         
         Process::run([
-            'composer',
+            $this->composer(),
             'config', 
             'minimum-stability', 
             'dev'
-        ], function ($type, $buffer) {
+        ], function ($type, $buffer): void {
             $this->output->write($buffer);
         });
 

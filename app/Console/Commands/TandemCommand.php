@@ -54,7 +54,7 @@ class TandemCommand extends Command
             }
         }
 
-        $this->installStubs();
+        $this->installStubs($this->stubPath(), $this->buildPath());
 
         $phpFiles = File::allFiles($this->modPath(), true);
         foreach ($phpFiles as $file) {

@@ -4,20 +4,18 @@ namespace Inmanturbo\Tandem\Concerns;
 
 use Illuminate\Support\Facades\File;
 
+use function Illuminate\Filesystem\join_paths;
+
 trait InstallsStubs
 {
-    abstract protected function stubPath();
 
-    abstract protected function buildPath();
-
-    protected function installStubs()
+    protected function installStubs($stubPath, $installPath)
     {
-        $this->info('Copying files...');
+        if (app()->runningInConsole()) {
+            $this->info('Copying files...');
+        }
 
-        $sourceDir = $this->stubPath();
-        $destinationDir = $this->buildPath();
-
-        if (! File::exists($sourceDir)) {
+        if (! File::exists($stubPath)) {
             if (app()->runningInConsole()) {
                 $this->info('No files to copy!');
             }
@@ -25,10 +23,10 @@ trait InstallsStubs
             return;
         }
 
-        $files = File::allFiles($sourceDir, true);
+        $files = File::allFiles($stubPath, true);
 
         foreach ($files as $file) {
-            $destinationFilePath = $destinationDir.'/'.$file->getRelativePathname();
+            $destinationFilePath = join_paths($installPath, $file->getRelativePathname());
             File::ensureDirectoryExists(dirname($destinationFilePath));
             File::copy($sourceFile = $file->getPathname(), $destinationFilePath);
 

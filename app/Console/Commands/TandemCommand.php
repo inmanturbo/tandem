@@ -3,36 +3,23 @@
 namespace Inmanturbo\Tandem\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
+use Inmanturbo\Tandem\Actions\CopyFiles;
 use Inmanturbo\Tandem\Concerns\InstallsStubs;
-use Inmanturbo\Tandem\Concerns\ReplacesFileContent;
-use Inmanturbo\Tandem\ReplaceNamespaceApp;
-use Inmanturbo\Tandem\ReplaceNamespaceDatabase;
-use Inmanturbo\Tandem\ReplaceUseApp;
-use Inmanturbo\Tandem\ReplaceUseDatabase;
+use Inmanturbo\Tandem\Tasks\ReplaceNamespace;
 
 use function Illuminate\Filesystem\join_paths;
 
 class TandemCommand extends Command
 {
     use InstallsStubs;
-    use ReplacesFileContent;
 
     protected $signature = 'tandem {mod?} {vendor?} {namespace?} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
 
     protected $description = 'Sets up a new Laravel module with the specified namespace and vendor.';
-
-    protected function findAndReplaceOperations()
-    {
-        return [
-            new ReplaceNamespaceApp($this->fullyQualifiedNamespace()),
-            new ReplaceNamespaceDatabase($this->fullyQualifiedNamespace()),
-            new ReplaceUseApp($this->fullyQualifiedNamespace()),
-            new ReplaceUseDatabase($this->fullyQualifiedNamespace()),
-        ];
-    }
 
     public function handle(): int
     {
@@ -70,9 +57,11 @@ class TandemCommand extends Command
             }
         }
 
-        $this->installStubs($this->stubPath(), $this->buildPath());
+        Event::listen('copy-files.info', fn ($payload) => $this->info($payload['message']));
 
-        $this->replaceFileContent($this->buildPath(), ...$this->findAndReplaceOperations());
+        app(CopyFiles::class)->copyFiles($this->stubPath(), $this->buildPath(), $this->output->isVerbose());
+
+        app(ReplaceNamespace::class)->run($this->buildPath(), $this->fullyQualifiedNamespace());
 
         $this->updateComposerJson($this->composerFile(), $this->fullyQualifiedNamespace(), $this->packageName());
 
@@ -84,7 +73,7 @@ class TandemCommand extends Command
                 'require',
                 '--dev',
                 'rector/rector',
-                'phpstan/phpstan'
+                'phpstan/phpstan',
             ],
             [
                 $this->composer(),
@@ -93,9 +82,9 @@ class TandemCommand extends Command
                 $repositoryConfig = json_encode([
                     'type' => 'path',
                     'url' => '../*',
-                    'options' => ['symlink' => false]
+                    'options' => ['symlink' => false],
                 ]),
-                '--file', 
+                '--file',
                 'composer.json',
             ],
             [
@@ -103,7 +92,7 @@ class TandemCommand extends Command
                 'config',
                 'minimum-stability',
                 'dev',
-            ]
+            ],
         ];
 
         foreach ($commands as $command) {
@@ -112,8 +101,8 @@ class TandemCommand extends Command
             });
 
             if (! $process->successful()) {
-                $this->error('Failed to run ' . implode(' ', $command));
-    
+                $this->error('Failed to run '.implode(' ', $command));
+
                 return 1;
             }
         }
@@ -124,7 +113,7 @@ class TandemCommand extends Command
             Process::run([
                 $this->composer(),
                 'require',
-                "{$this->packageName()}:*"
+                "{$this->packageName()}:*",
             ], function ($type, $buffer): void {
                 $this->output->write($buffer);
             });
@@ -133,13 +122,12 @@ class TandemCommand extends Command
         return 0;
     }
 
-
-    protected function composer():string
+    protected function composer(): string
     {
         return 'composer';
     }
 
-    protected function laravel():string
+    protected function laravel(): string
     {
         return 'laravel';
     }
@@ -162,7 +150,7 @@ class TandemCommand extends Command
         ]);
     }
 
-    protected function updateComposerJson(string $composerFile, string $fullyQualifiedNamespace, string $packageName) : void
+    protected function updateComposerJson(string $composerFile, string $fullyQualifiedNamespace, string $packageName): void
     {
         $composerData = json_decode(File::get($composerFile), true);
 
@@ -200,25 +188,25 @@ class TandemCommand extends Command
     protected function initializeModRepository(): void
     {
         Process::run([
-            $this->composer(), 
-            'config', 
-            'repositories.mod', 
+            $this->composer(),
+            'config',
+            'repositories.mod',
             $repositoryConfig = json_encode([
                 'type' => 'path',
                 'url' => 'mod/*',
-                'options' => ['symlink' => true]
+                'options' => ['symlink' => true],
             ]),
-            '--file', 
-            'composer.json'
+            '--file',
+            'composer.json',
         ], function ($type, $buffer): void {
             $this->output->write($buffer);
         });
-        
+
         Process::run([
             $this->composer(),
-            'config', 
-            'minimum-stability', 
-            'dev'
+            'config',
+            'minimum-stability',
+            'dev',
         ], function ($type, $buffer): void {
             $this->output->write($buffer);
         });

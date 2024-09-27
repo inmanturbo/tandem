@@ -2,15 +2,13 @@
 
 namespace Inmanturbo\Tandem;
 
-class FindAndReplaceOperation
+class ReplaceInFiles
 {
-    
     public function __construct(
         public string $search,
         public string $replace,
         public string $path = '*',
-    )
-    {}
+    ) {}
 
     public static function make(...$args): static
     {

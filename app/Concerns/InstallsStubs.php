@@ -8,7 +8,6 @@ use function Illuminate\Filesystem\join_paths;
 
 trait InstallsStubs
 {
-
     protected function installStubs($stubPath, $installPath)
     {
         if (app()->runningInConsole()) {

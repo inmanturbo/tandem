@@ -2,15 +2,14 @@
 
 namespace Inmanturbo\Tandem;
 
-class ReplaceUseDatabase extends FindAndReplaceOperation
+class ReplaceUseDatabase extends ReplaceInFiles
 {
     public string $search = 'use Database';
 
     public function __construct(
         public string $namespace,
         public string $path = '*',
-    )
-    {
+    ) {
         parent::__construct($this->search, "use {$namespace}\\Database", $path);
     }
 }

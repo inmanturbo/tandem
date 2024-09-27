@@ -6,31 +6,17 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
-use Inmanturbo\Tandem\Concerns\ReplacesFileContent;
 use Inmanturbo\Tandem\Concerns\InstallsStubs;
-use Inmanturbo\Tandem\ReplaceNamespaceApp;
-use Inmanturbo\Tandem\ReplaceUseApp;
-use Inmanturbo\Tandem\ReplaceUseDatabase;
 
 use function Illuminate\Filesystem\join_paths;
 
 class TandemCommand extends Command
 {
     use InstallsStubs;
-    use ReplacesFileContent;
 
     protected $signature = 'tandem {mod?} {vendor?} {namespace?} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
 
     protected $description = 'Sets up a new Laravel module with the specified namespace and vendor.';
-
-    protected function findAndReplaceOperations()
-    {
-        return [
-            new ReplaceNamespaceApp($this->fullQualifiedNamespace()),
-            new ReplaceUseDatabase($this->fullQualifiedNamespace()),
-            new ReplaceUseApp($this->fullQualifiedNamespace()),
-        ];
-    }
 
     public function handle(): int
     {
@@ -69,13 +55,12 @@ class TandemCommand extends Command
         }
 
         $this->installStubs();
-        $this->replaceFileContents($this->buildPath(), ...$this->findAndReplaceOperations());
 
-        // $phpFiles = File::allFiles($this->modPath(), true);
-        // foreach ($phpFiles as $file) {
-        //     $filePath = $file->getRealPath();
-        //     $this->replaceAppNamespace($filePath, $this->fullQualifiedNamespace());
-        // }
+        $phpFiles = File::allFiles($this->modPath(), true);
+        foreach ($phpFiles as $file) {
+            $filePath = $file->getRealPath();
+            $this->replaceAppNamespace($filePath, $this->fullQualifiedNamespace());
+        }
 
         $this->updateComposerJson($this->composerFile(), $this->fullQualifiedNamespace(), $this->packageName());
 

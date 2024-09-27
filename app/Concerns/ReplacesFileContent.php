@@ -3,6 +3,8 @@
 namespace Inmanturbo\Tandem\Concerns;
 
 use Inmanturbo\Tandem\FindAndReplaceOperation;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 use function Illuminate\Filesystem\join_paths;
 
@@ -22,23 +24,38 @@ trait ReplacesFileContent
         }
     }
 
-    protected function fileGlob($basePath, string $relativePath = '*') : array|false
+    protected function fileGlob($basePath, string $relativePath = '*') : array
     {
-        if (! str_contains($relativePath, '/') && ! str_contains($relativePath, '\\')) {
-            $filePattern = join_paths($basePath, $relativePath);
+        $filePattern = join_paths($basePath, $relativePath);
 
-            return $this->onlyFiles(glob($filePattern, GLOB_BRACE));
+        if (str_contains($relativePath, '**')) {
+            return $this->recursiveGlob($filePattern);
         }
-
-        $filePattern = join_paths($basePath, ...explode(
-            DIRECTORY_SEPARATOR,
-            str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath),
-        ));
 
         return $this->onlyFiles(glob($filePattern, GLOB_BRACE));
     }
 
-    protected function onlyFiles(array $glob)
+    protected function recursiveGlob(string $pattern): array
+    {
+        $paths = [];
+        $directory = dirname($pattern);
+        $filePattern = basename($pattern);
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && fnmatch($filePattern, $file->getFilename())) {
+                $paths[] = $file->getRealPath();
+            }
+        }
+
+        return $this->onlyFiles($paths);
+    }
+
+    protected function onlyFiles(array $glob): array
     {
         return array_filter($glob, 'is_file');
     }

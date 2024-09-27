@@ -18,6 +18,7 @@ use function Illuminate\Filesystem\join_paths;
 class TandemCommand extends Command
 {
     use InstallsStubs;
+    use ReplacesFileContent;
 
     protected $signature = 'tandem {mod?} {vendor?} {namespace?} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
 
@@ -71,7 +72,7 @@ class TandemCommand extends Command
 
         $this->installStubs($this->stubPath(), $this->buildPath());
 
-        $this->replaceFileContents($this->buildPath(), ...$this->findAndReplaceOperations());
+        $this->replaceFileContent($this->buildPath(), ...$this->findAndReplaceOperations());
 
         $this->updateComposerJson($this->composerFile(), $this->fullyQualifiedNamespace(), $this->packageName());
 

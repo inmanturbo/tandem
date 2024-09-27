@@ -14,7 +14,7 @@ trait ReplacesFileContent
         file_put_contents($path, str_replace($search, $replace, file_get_contents($path)));
     }
 
-    protected function replaceFileContents($basePath, FindAndReplaceOperation ...$operations)
+    protected function replaceFileContent($basePath, FindAndReplaceOperation ...$operations)
     {
         foreach ($operations as $operation) {
             foreach ($this->fileGlob($basePath, $operation->path) as $path) {

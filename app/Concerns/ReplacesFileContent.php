@@ -2,6 +2,7 @@
 
 namespace Inmanturbo\Tandem\Concerns;
 
+use Illuminate\Support\Facades\File;
 use Inmanturbo\Tandem\FindAndReplaceOperation;
 
 use function Illuminate\Filesystem\join_paths;
@@ -22,24 +23,53 @@ trait ReplacesFileContent
         }
     }
 
-    protected function fileGlob($basePath, string $relativePath = '*') : array|false
+    protected function filePattern($basePath, string $relativePath = '*') : string
     {
         if (! str_contains($relativePath, '/') && ! str_contains($relativePath, '\\')) {
-            $filePattern = join_paths($basePath, $relativePath);
 
-            return $this->onlyFiles(glob($filePattern, GLOB_BRACE));
+            return join_paths($basePath, $relativePath);
         }
 
-        $filePattern = join_paths($basePath, ...explode(
+        return join_paths($basePath, ...explode(
             DIRECTORY_SEPARATOR,
             str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath),
         ));
-
-        return $this->onlyFiles(glob($filePattern, GLOB_BRACE));
     }
 
     protected function onlyFiles(array $glob)
     {
         return array_filter($glob, 'is_file');
+    }
+
+    protected function fileGlob($basePath, string $relativePath = '*') : array|false
+    {
+        $pattern = $this->filePattern($basePath, $relativePath);
+
+        return $this->findFilesByPattern($pattern);
+    }
+
+    public function findFilesByPattern(string $pattern): array|false
+    {   
+        if (str_contains($pattern, '**')) {
+            $basePath = substr($pattern, 0, strpos($pattern, '/**'));
+
+            $files = File::allFiles($basePath);
+            
+            if (basename($pattern) == '**') {
+                return $files;
+            }
+
+            $filename = basename($pattern);
+            
+            return array_filter($files, function ($file) use ($filename) {
+                return fnmatch($filename, $file->getFilename());
+            });
+        }elseif (str_contains($pattern, '*')) {
+            return array_filter($files = glob($pattern), function ($file) {
+                return is_file($file);
+            });
+        }
+
+        return is_file($pattern) ? [$pattern] : [];
     }
 }

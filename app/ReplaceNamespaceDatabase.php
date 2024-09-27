@@ -11,6 +11,6 @@ class ReplaceNamespaceDatabase extends FindAndReplaceOperation
         public string $path = 'database/**/*.php',
     )
     {
-        parent::__construct($this->search, "namespace {$namespace}", $path);
+        parent::__construct($this->search, "namespace {$namespace}\\Database", $path);
     }
 }

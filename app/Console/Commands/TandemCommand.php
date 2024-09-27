@@ -7,16 +7,32 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Inmanturbo\Tandem\Concerns\InstallsStubs;
+use Inmanturbo\Tandem\Concerns\ReplacesFileContent;
+use Inmanturbo\Tandem\ReplaceNamespaceApp;
+use Inmanturbo\Tandem\ReplaceNamespaceDatabase;
+use Inmanturbo\Tandem\ReplaceUseApp;
+use Inmanturbo\Tandem\ReplaceUseDatabase;
 
 use function Illuminate\Filesystem\join_paths;
 
 class TandemCommand extends Command
 {
     use InstallsStubs;
+    use ReplacesFileContent;
 
     protected $signature = 'tandem {mod?} {vendor?} {namespace?} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
 
     protected $description = 'Sets up a new Laravel module with the specified namespace and vendor.';
+
+    protected function findAndReplaceOperations()
+    {
+        return [
+            new ReplaceNamespaceApp($this->fullyQualifiedNamespace()),
+            new ReplaceNamespaceDatabase($this->fullyQualifiedNamespace()),
+            new ReplaceUseApp($this->fullyQualifiedNamespace()),
+            new ReplaceUseDatabase($this->fullyQualifiedNamespace()),
+        ];
+    }
 
     public function handle(): int
     {
@@ -36,7 +52,7 @@ class TandemCommand extends Command
             return 0;
         }
 
-        if (! File::exists($this->modPath())) {
+        if (! File::exists($this->buildPath())) {
             $this->info("Creating new Laravel module: {$this->argument('mod')}");
 
             $process = Process::path(base_path('mod'))->run([
@@ -56,13 +72,9 @@ class TandemCommand extends Command
 
         $this->installStubs($this->stubPath(), $this->buildPath());
 
-        $phpFiles = File::allFiles($this->modPath(), true);
-        foreach ($phpFiles as $file) {
-            $filePath = $file->getRealPath();
-            $this->replaceAppNamespace($filePath, $this->fullQualifiedNamespace());
-        }
+        $this->replaceFileContents($this->buildPath(), ...$this->findAndReplaceOperations());
 
-        $this->updateComposerJson($this->composerFile(), $this->fullQualifiedNamespace(), $this->packageName());
+        $this->updateComposerJson($this->composerFile(), $this->fullyQualifiedNamespace(), $this->packageName());
 
         $this->info('Running Composer commands...');
 
@@ -132,25 +144,12 @@ class TandemCommand extends Command
         return 'laravel';
     }
 
-    protected function replaceAppNamespace($filePath, $fullyQualifiedNamespace)
-    {
-        $content = File::get($filePath);
-
-        $content = str_replace('namespace App', "namespace {$fullyQualifiedNamespace}", $content);
-        $content = str_replace('use App', "use {$fullyQualifiedNamespace}", $content);
-        $content = str_replace('use Database', "use {$fullyQualifiedNamespace}\\Database", $content);
-        $content = str_replace(' App\\', " {$fullyQualifiedNamespace}\\", $content);
-        $content = str_replace('namespace Database\\', "namespace {$fullyQualifiedNamespace}\\Database\\", $content);
-
-        File::put($filePath, $content);
-    }
-
     protected function composerFile()
     {
         return join_paths($this->modPath(), 'composer.json');
     }
 
-    protected function fullQualifiedNamespace(): string
+    protected function fullyQualifiedNamespace(): string
     {
         return "{$this->argument('vendor')}\\{$this->argument('namespace')}";
     }

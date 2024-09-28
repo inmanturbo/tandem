@@ -8,7 +8,7 @@ use function Illuminate\Filesystem\join_paths;
 
 class CopyFiles
 {
-    public function copyFiles($from, $to, $verbose = false)
+    public function __invoke($from, $to, $verbose = false): void
     {
         $this->info('Copying files...');
 

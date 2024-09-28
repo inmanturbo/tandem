@@ -8,7 +8,7 @@ class ReplaceNamespaceDatabase extends ReplaceInFiles
 
     public function __construct(
         public string $namespace,
-        public string $path = 'database/**/*.php',
+        public string|array|null $path = null,
     ) {
         parent::__construct($this->search, "namespace {$namespace}\\Database", $path);
     }

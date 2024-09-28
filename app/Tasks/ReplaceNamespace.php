@@ -3,6 +3,7 @@
 namespace Inmanturbo\Tandem\Tasks;
 
 use Inmanturbo\Tandem\Actions\FindAndReplaceInFiles;
+use Inmanturbo\Tandem\ModInstall;
 use Inmanturbo\Tandem\ReplaceNamespaceApp;
 use Inmanturbo\Tandem\ReplaceNamespaceDatabase;
 use Inmanturbo\Tandem\ReplaceUseApp;
@@ -10,7 +11,7 @@ use Inmanturbo\Tandem\ReplaceUseDatabase;
 
 class ReplaceNamespace
 {
-    protected function tasks(string $replacement): array
+    protected function replacers(string $replacement): array
     {
         return [
             new ReplaceNamespaceApp($replacement),
@@ -20,9 +21,10 @@ class ReplaceNamespace
         ];
     }
 
-
-    public function run(string $basePath, string $replacement): void
+    public function __invoke(ModInstall $mod): ModInstall
     {
-        app(FindAndReplaceInFiles::class)->handle($basePath, ...$this->tasks($replacement));
+        app(FindAndReplaceInFiles::class)($mod->basePath(), ...$this->replacers($mod->fullyQualifiedNamespace()));
+
+        return $mod;
     }
 }

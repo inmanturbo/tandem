@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "42f8283eb0f61d5a96a788fee1dace11",
+    "content-hash": "f330ebcba95f932116ef8ed21f9af2a9",
     "packages": [
         {
             "name": "brick/math",
@@ -1049,6 +1049,54 @@
                 }
             ],
             "time": "2023-12-03T19:50:20+00:00"
+        },
+        {
+            "name": "inmanturbo/pipes",
+            "version": "v1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inmanturbo/pipes.git",
+                "reference": "2939222b50e460b7742653a838d223a2ec4218de"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/inmanturbo/pipes/zipball/2939222b50e460b7742653a838d223a2ec4218de",
+                "reference": "2939222b50e460b7742653a838d223a2ec4218de",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "illuminate/contracts": "^11.20",
+                "laravel/pint": "dev-main",
+                "pestphp/pest": "3.x-dev",
+                "pestphp/pest-plugin-laravel": "3.x-dev",
+                "phpstan/extension-installer": "1.4.x-dev",
+                "phpstan/phpstan-deprecation-rules": "1.2.x-dev",
+                "phpstan/phpstan-phpunit": "1.4.x-dev"
+            },
+            "type": "library",
+            "autoload": {
+                "files": [
+                    "functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "inmanturbo"
+                }
+            ],
+            "description": "Pipes for php with a simple api based on functional composition",
+            "support": {
+                "issues": "https://github.com/inmanturbo/pipes/issues",
+                "source": "https://github.com/inmanturbo/pipes/tree/v1.1.5"
+            },
+            "time": "2024-08-14T00:09:37+00:00"
         },
         {
             "name": "laravel/framework",

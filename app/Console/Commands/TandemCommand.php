@@ -8,15 +8,15 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
 use Inmanturbo\Tandem\Actions\CopyFiles;
-use Inmanturbo\Tandem\Concerns\InstallsStubs;
+use Inmanturbo\Tandem\Actions\InstallMod;
+use Inmanturbo\Tandem\ModInstall;
+use Inmanturbo\Tandem\Tasks\ConfigureComposer;
 use Inmanturbo\Tandem\Tasks\ReplaceNamespace;
 
 use function Illuminate\Filesystem\join_paths;
 
 class TandemCommand extends Command
 {
-    use InstallsStubs;
-
     protected $signature = 'tandem {mod?} {vendor?} {namespace?} {--install : Whether to install the mod to composer.json} {--init : Whether to initialize the local repository}';
 
     protected $description = 'Sets up a new Laravel module with the specified namespace and vendor.';
@@ -59,11 +59,12 @@ class TandemCommand extends Command
 
         Event::listen('copy-files.info', fn ($payload) => $this->info($payload['message']));
 
-        app(CopyFiles::class)->copyFiles($this->stubPath(), $this->buildPath(), $this->output->isVerbose());
-
-        app(ReplaceNamespace::class)->run($this->buildPath(), $this->fullyQualifiedNamespace());
-
-        $this->updateComposerJson($this->composerFile(), $this->fullyQualifiedNamespace(), $this->packageName());
+        app(InstallMod::class)->install(new ModInstall(
+            $this->argument('mod'),
+            $this->argument('namespace'),
+            $this->argument('vendor'),
+            $this->output->isVerbose(),
+        ));
 
         $this->info('Running Composer commands...');
 
@@ -148,26 +149,6 @@ class TandemCommand extends Command
             (string) Str::of($this->argument('vendor'))->kebab()->lower(),
             (string) Str::of($this->argument('mod'))->kebab()->lower(),
         ]);
-    }
-
-    protected function updateComposerJson(string $composerFile, string $fullyQualifiedNamespace, string $packageName): void
-    {
-        $composerData = json_decode(File::get($composerFile), true);
-
-        unset($composerData['autoload']['psr-4']);
-
-        $composerData['autoload']['psr-4']["{$fullyQualifiedNamespace}\\Database\\Factories\\"] = 'database/factories/';
-        $composerData['autoload']['psr-4']["{$fullyQualifiedNamespace}\\Database\\Seeders\\"] = 'database/seeders/';
-        $composerData['autoload']['psr-4']["{$fullyQualifiedNamespace}\\"] = 'app/';
-
-        $composerData['name'] = $packageName;
-
-        if (! isset($composerData['extra']['laravel']['providers'])) {
-            $composerData['extra']['laravel']['providers'] = [];
-        }
-        $composerData['extra']['laravel']['providers'][] = "{$fullyQualifiedNamespace}\\Providers\\AppServiceProvider";
-
-        File::put($this->composerFile(), json_encode($composerData, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 
     protected function modPath(): string

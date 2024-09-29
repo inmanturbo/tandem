@@ -1,7 +1,7 @@
 {
-    "name": "inmanturbo/tandem",
+    "name": "inmanturbo/tandem2",
     "type": "project",
-    "description": "Run laravel apps in tandem.",
+    "description": "The skeleton application for the Laravel framework.",
     "keywords": [
         "laravel",
         "framework"
@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "inmanturbo/pipes": "^1.1",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9"
     },
@@ -55,7 +54,6 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": [],
             "providers": [
                 "Inmanturbo\\Tandem\\Providers\\AppServiceProvider"
             ]
@@ -75,9 +73,9 @@
     "repositories": {
         "mod": {
             "type": "path",
-            "url": "mod/*",
+            "url": "../*",
             "options": {
-                "symlink": true
+                "symlink": false
             }
         }
     }

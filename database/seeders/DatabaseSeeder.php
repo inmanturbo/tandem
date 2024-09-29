@@ -2,9 +2,9 @@
 
 namespace Inmanturbo\Tandem\Database\Seeders;
 
-use Illuminate\Database\Seeder;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Inmanturbo\Tandem\Models\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {

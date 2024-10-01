@@ -8,7 +8,7 @@ class ComposerPackageData
 
     public function __construct(
         public string $namespace,
-        public string $name,
+        public ?string $name = null,
     ) {
         $this->data['autoload']['psr-4'] = [
             "{$namespace}\\Database\\Factories\\" => 'database/factories/',
@@ -16,7 +16,9 @@ class ComposerPackageData
             "{$namespace}\\" => 'app/',
         ];
 
-        $this->data['name'] = $name;
+        if ($name) {
+            $this->data['name'] = $name;
+        }
 
         $this->data['extra']['laravel']['providers'] = ["{$namespace}\\Providers\\AppServiceProvider"];
     }

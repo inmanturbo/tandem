@@ -28,4 +28,18 @@ class FindAndReplaceInFiles
 
         return $finder->name('*.php');
     }
+
+    public function search(string $search): self
+    {
+        $this->search = $search;
+
+        return $this;
+    }
+
+    public function replace(string $replace): self
+    {
+        $this->replace = $replace;
+
+        return $this;
+    }
 }

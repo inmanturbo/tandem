@@ -2,14 +2,15 @@
 
 namespace Inmanturbo\Tandem\Actions;
 
-class UpdateComposerJson
+class ReplaceInFile
 {
     /**
      * Create a new class instance.
      */
     public function __construct(
-        public string $composerFilePath,
-        public array $updatedData,
+        public string|array $search,
+        public string $replace,
+        public string $path
     ) {
         //
     }

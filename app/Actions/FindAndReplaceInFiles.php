@@ -2,21 +2,30 @@
 
 namespace Inmanturbo\Tandem\Actions;
 
-use Inmanturbo\Tandem\ReplaceInFiles;
+use Symfony\Component\Finder\Finder;
 
 class FindAndReplaceInFiles
 {
-    public function __invoke(string $basePath, ReplaceInFiles ...$operations): void
+    public function __construct(
+        public string $search,
+        public string $replace,
+        public string $basePath,
+        public string|array|null $path = null,
+    ) {}
+
+    public static function make(...$args): static
     {
-        foreach ($operations as $operation) {
-            foreach ($operation->find($basePath) as $file) {
-                $this->replaceInFile($operation->search, $operation->replace, $file);
-            }
-        }
+        return new static(...$args);
     }
 
-    protected function replaceInFile(string|array $search, string $replace, string $path): void
+    public function find(): Finder
     {
-        file_put_contents($path, str_replace($search, $replace, file_get_contents($path)));
+        $finder = (new Finder)->in($this->basePath)->notPath('#(vendor|temp|tmp|e2e|bin|build|storage|node_modules)#');
+
+        if ($this->path) {
+            $finder->path($this->path);
+        }
+
+        return $finder->name('*.php');
     }
 }

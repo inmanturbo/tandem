@@ -2,11 +2,11 @@
 
 namespace Inmanturbo\Tandem\Actions;
 
-class CopyFiles
+class Output
 {
     public function __construct(
-        public string $from,
-        public string $to,
+        public string $output,
+        public string $type = 'actions.info',
     ) {
         //
     }

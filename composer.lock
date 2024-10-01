@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f330ebcba95f932116ef8ed21f9af2a9",
+    "content-hash": "eca133d91210074b8bddbe67422c0ff1",
     "packages": [
         {
             "name": "brick/math",
@@ -1051,65 +1051,17 @@
             "time": "2023-12-03T19:50:20+00:00"
         },
         {
-            "name": "inmanturbo/pipes",
-            "version": "v1.1.5",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/inmanturbo/pipes.git",
-                "reference": "2939222b50e460b7742653a838d223a2ec4218de"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/inmanturbo/pipes/zipball/2939222b50e460b7742653a838d223a2ec4218de",
-                "reference": "2939222b50e460b7742653a838d223a2ec4218de",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^8.2"
-            },
-            "require-dev": {
-                "illuminate/contracts": "^11.20",
-                "laravel/pint": "dev-main",
-                "pestphp/pest": "3.x-dev",
-                "pestphp/pest-plugin-laravel": "3.x-dev",
-                "phpstan/extension-installer": "1.4.x-dev",
-                "phpstan/phpstan-deprecation-rules": "1.2.x-dev",
-                "phpstan/phpstan-phpunit": "1.4.x-dev"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "inmanturbo"
-                }
-            ],
-            "description": "Pipes for php with a simple api based on functional composition",
-            "support": {
-                "issues": "https://github.com/inmanturbo/pipes/issues",
-                "source": "https://github.com/inmanturbo/pipes/tree/v1.1.5"
-            },
-            "time": "2024-08-14T00:09:37+00:00"
-        },
-        {
             "name": "laravel/framework",
-            "version": "v11.24.1",
+            "version": "v11.25.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "e063fa80ac5818099f45a3a57dd803476c8f3a2a"
+                "reference": "b487a9089c0b1c71ac63bb6bc44fb4b00dc6da2e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/e063fa80ac5818099f45a3a57dd803476c8f3a2a",
-                "reference": "e063fa80ac5818099f45a3a57dd803476c8f3a2a",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/b487a9089c0b1c71ac63bb6bc44fb4b00dc6da2e",
+                "reference": "b487a9089c0b1c71ac63bb6bc44fb4b00dc6da2e",
                 "shasum": ""
             },
             "require": {
@@ -1305,7 +1257,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2024-09-25T07:21:24+00:00"
+            "time": "2024-09-26T11:21:58+00:00"
         },
         {
             "name": "laravel/prompts",
@@ -6474,16 +6426,16 @@
         },
         {
             "name": "pestphp/pest",
-            "version": "v3.2.3",
+            "version": "v3.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pestphp/pest.git",
-                "reference": "4e2987d438a3c3b2f291d2c991049544ab2f52bb"
+                "reference": "5fe79d9c18a674e9cce2f36f365516c26ae87b49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pestphp/pest/zipball/4e2987d438a3c3b2f291d2c991049544ab2f52bb",
-                "reference": "4e2987d438a3c3b2f291d2c991049544ab2f52bb",
+                "url": "https://api.github.com/repos/pestphp/pest/zipball/5fe79d9c18a674e9cce2f36f365516c26ae87b49",
+                "reference": "5fe79d9c18a674e9cce2f36f365516c26ae87b49",
                 "shasum": ""
             },
             "require": {
@@ -6569,7 +6521,7 @@
             ],
             "support": {
                 "issues": "https://github.com/pestphp/pest/issues",
-                "source": "https://github.com/pestphp/pest/tree/v3.2.3"
+                "source": "https://github.com/pestphp/pest/tree/v3.2.4"
             },
             "funding": [
                 {
@@ -6581,7 +6533,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-09-25T15:19:39+00:00"
+            "time": "2024-09-26T22:53:39+00:00"
         },
         {
             "name": "pestphp/pest-plugin",
@@ -7164,16 +7116,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "1.31.0",
+            "version": "1.32.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "249f15fb843bf240cf058372dad29e100cee6c17"
+                "reference": "6ca22b154efdd9e3c68c56f5d94670920a1c19a4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/249f15fb843bf240cf058372dad29e100cee6c17",
-                "reference": "249f15fb843bf240cf058372dad29e100cee6c17",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/6ca22b154efdd9e3c68c56f5d94670920a1c19a4",
+                "reference": "6ca22b154efdd9e3c68c56f5d94670920a1c19a4",
                 "shasum": ""
             },
             "require": {
@@ -7205,22 +7157,22 @@
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
             "support": {
                 "issues": "https://github.com/phpstan/phpdoc-parser/issues",
-                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.31.0"
+                "source": "https://github.com/phpstan/phpdoc-parser/tree/1.32.0"
             },
-            "time": "2024-09-22T11:32:18+00:00"
+            "time": "2024-09-26T07:23:32+00:00"
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.12.4",
+            "version": "1.12.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "ffa517cb918591b93acc9b95c0bebdcd0e4538bd"
+                "reference": "7e6c6cb7cecb0a6254009a1a8a7d54ec99812b17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/ffa517cb918591b93acc9b95c0bebdcd0e4538bd",
-                "reference": "ffa517cb918591b93acc9b95c0bebdcd0e4538bd",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/7e6c6cb7cecb0a6254009a1a8a7d54ec99812b17",
+                "reference": "7e6c6cb7cecb0a6254009a1a8a7d54ec99812b17",
                 "shasum": ""
             },
             "require": {
@@ -7265,7 +7217,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-09-19T07:58:01+00:00"
+            "time": "2024-09-26T12:45:22+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

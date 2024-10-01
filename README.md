@@ -36,6 +36,6 @@ Also will update composer.json to reflect namespace, and add `Inmanturbo\Teams\P
 
 Additionally, any stub files found within `base_path('stubs/mod')` will be copied into the "package" as well, at the path relative to their path within `base_path('stubs/mod')`.
 
-Lastly, it will add a local repository to your main app's composer.json at the path `mod/*`, and install the package into you app using a symlink.
+Lastly, it will add a local repository to your main app's composer.json at the path `mod/*`, and install the package into your app using a symlink.
 
 You will be able to use your package as a project and/or package, and use artisan commands from within the package during development.

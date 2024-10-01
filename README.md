@@ -21,7 +21,7 @@ Clone or fork this repo.
 Tandem is just a minimal laravel app and/or package with an additional artisan command `tandem`.
 
 ```bash
-php artisan tandem <mod-name> <vendor-namespace> <mod-namespace> --init --install
+php artisan tandem <mod-name> <vendor-namespace> <app-namespace> --init --install
 ```
 
 Example:

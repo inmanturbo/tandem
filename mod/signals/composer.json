@@ -1,5 +1,5 @@
 {
-    "name": "inmanturbo/tandem2",
+    "name": "inmanturbo/signals",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
     "keywords": [
@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "inmanturbo/signals": "*",
         "laravel/framework": "^11.9",
         "laravel/tinker": "^2.9"
     },
@@ -26,9 +25,9 @@
     },
     "autoload": {
         "psr-4": {
-            "Inmanturbo\\Tandem\\Database\\Factories\\": "database/factories/",
-            "Inmanturbo\\Tandem\\Database\\Seeders\\": "database/seeders/",
-            "Inmanturbo\\Tandem\\": "app/"
+            "Inmanturbo\\Signals\\Database\\Factories\\": "database/factories/",
+            "Inmanturbo\\Signals\\Database\\Seeders\\": "database/seeders/",
+            "Inmanturbo\\Signals\\": "app/"
         }
     },
     "autoload-dev": {
@@ -56,7 +55,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Inmanturbo\\Tandem\\Providers\\AppServiceProvider"
+                "Inmanturbo\\Signals\\Providers\\AppServiceProvider"
             ]
         }
     },
@@ -74,9 +73,9 @@
     "repositories": {
         "mod": {
             "type": "path",
-            "url": "mod/*",
+            "url": "../*",
             "options": {
-                "symlink": true
+                "symlink": false
             }
         }
     }

@@ -9,8 +9,8 @@ use function Illuminate\Filesystem\join_paths;
 class Tandem
 {
     public function __construct(
-        public string $mod,
-        public string $modNamespace,
+        public string $modName,
+        public string $appNamespace,
         public string $vendorNamespace = 'Mod',
         public bool $verbose = false,
         public bool $init = false,
@@ -21,12 +21,12 @@ class Tandem
 
     public function modName()
     {
-        return $this->mod;
+        return $this->modName;
     }
 
     public function basePath(): string
     {
-        return join_paths($this->repositoryPath(), $this->mod);
+        return join_paths($this->repositoryPath(), $this->modName);
     }
 
     public function repositoryPath(): string
@@ -48,13 +48,13 @@ class Tandem
     {
         return implode('/', [
             (string) Str::of($this->vendorNamespace)->kebab()->lower(),
-            (string) Str::of($this->mod)->kebab()->lower(),
+            (string) Str::of($this->modName)->kebab()->lower(),
         ]);
     }
 
     public function fullyQualifiedNamespace(): string
     {
-        return "{$this->vendorNamespace}\\{$this->modNamespace}";
+        return "{$this->vendorNamespace}\\{$this->appNamespace}";
     }
 
     public function isVerbose(): bool

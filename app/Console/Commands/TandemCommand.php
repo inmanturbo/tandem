@@ -14,7 +14,7 @@ class TandemCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'tandem {mod-name?} {vendor-namespace?} {mod-namespace?} 
+    protected $signature = 'tandem:app {mod-name?} {vendor-namespace?} {app-namespace?} 
         {--install : Whether to install the mod to composer.json} 
         {--init : Whether to initialize the local mod repository}';
 
@@ -23,7 +23,7 @@ class TandemCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Sets up a new Laravel app with the specified namespace and vendor.';
+    protected $description = 'Sets up a new Laravel app with the specified namespace and vendor, to be used as a package or module.';
 
     /**
      * Execute the console command.
@@ -31,16 +31,20 @@ class TandemCommand extends Command
     public function handle(): int
     {
         Event::listen('*.info', function($events, $payload) {
-            $this->info($events.implode($payload));
+            $this->info($events.': '.implode($payload));
         });
 
         Event::listen('*.error', function($events, $payload) {
-            $this->info($events.implode($payload));
+            $this->error($events.': '.implode($payload));
+        });
+
+        Event::listen('*.warn', function($events, $payload) {
+            $this->warn($events.': '.implode($payload));
         });
 
         app(TandemCommandHandler::class)(new Tandem(
             $this->argument('mod-name'),
-            $this->argument('mod-namespace'),
+            $this->argument('app-namespace'),
             $this->argument('vendor-namespace'),
             $this->output->isVerbose(),
             $this->option('init'),

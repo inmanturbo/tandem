@@ -11,6 +11,6 @@ class ReplaceAppModelsUserInAuthConfig extends FindAndReplaceInFiles
         public string $namespace,
         public string|array|null $path = 'config/auth.php',
     ) {
-        parent::__construct($this->search, "{$namespace}\User::class", $basePath, $path);
+        parent::__construct($this->search, "{$namespace}\Models\User::class", $basePath, $path);
     }
 }

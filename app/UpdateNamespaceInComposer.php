@@ -9,6 +9,10 @@ class UpdateNamespaceInComposer implements HandlesTandem
 {
     public function __invoke(Tandem $tandem): void
     {
+        if (! $tandem->fullyQualifiedNamespace()) {
+            return;
+        }
+
         app(InvokeUpdateComposerJson::class)(new UpdateComposerJson($tandem->composerFile(), $this->composerPackageData($tandem)));
     }
 

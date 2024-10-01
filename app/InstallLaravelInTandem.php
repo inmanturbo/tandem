@@ -16,7 +16,7 @@ class InstallLaravelInTandem implements HandlesTandem
      */
     public function __invoke(Tandem $tandem): void
     {
-        if (File::exists($tandem->basePath())) {
+        if (! $tandem->basePath() || File::exists($tandem->basePath())) {
             return;
         }
 

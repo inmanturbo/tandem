@@ -24,6 +24,10 @@ class ReplaceInTandemFiles implements HandlesTandem
 
     public function __invoke(Tandem $tandem): void
     {
+        if (! $tandem->fullyQualifiedNamespace()) {
+            return;
+        }
+
         app(InvokeFindReplaceInFiles::class)(...$this->replacers($tandem));
     }
 }

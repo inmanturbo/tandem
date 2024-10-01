@@ -11,6 +11,10 @@ class RunComposerCommandsInTandem implements HandlesTandem
 {
     public function __invoke(Tandem $tandem): void
     {
+        if (! $tandem->basePath() || ! $tandem->composer()) {
+            return;
+        }
+
         foreach ($this->composerCommands($tandem) as $command) {
             app(InvokeComposerCommand::class)(new ComposerCommand(
                 $tandem->basePath(),

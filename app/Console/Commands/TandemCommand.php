@@ -14,7 +14,7 @@ class TandemCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'tandem:app {mod-name?} {vendor-namespace?} {app-namespace?} 
+    protected $signature = 'tandem {mod-name?} {vendor-namespace?} {app-namespace?} 
         {--install : Whether to install the mod to composer.json} 
         {--init : Whether to initialize the local mod repository}';
 

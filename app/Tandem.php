@@ -9,9 +9,9 @@ use function Illuminate\Filesystem\join_paths;
 class Tandem
 {
     public function __construct(
-        public string $modName,
-        public string $appNamespace,
-        public string $vendorNamespace = 'Mod',
+        public ?string $modName = null,
+        public ?string $appNamespace = null,
+        public ?string $vendorNamespace = 'Mod',
         public bool $verbose = false,
         public bool $init = false,
         public bool $install = false,
@@ -19,13 +19,17 @@ class Tandem
         //
     }
 
-    public function modName()
+    public function modName(): ?string
     {
         return $this->modName;
     }
 
-    public function basePath(): string
+    public function basePath(): ?string
     {
+        if (! $this->modName) {
+            return null;
+        }
+
         return join_paths($this->repositoryPath(), $this->modName);
     }
 
@@ -44,16 +48,24 @@ class Tandem
         return join_paths($this->basePath(), 'composer.json');
     }
 
-    public function packageName(): string
+    public function packageName(): ?string
     {
+        if (! $this->vendorNamespace || ! $this->modName) {
+            return null;
+        }
+
         return implode('/', [
             (string) Str::of($this->vendorNamespace)->kebab()->lower(),
             (string) Str::of($this->modName)->kebab()->lower(),
         ]);
     }
 
-    public function fullyQualifiedNamespace(): string
+    public function fullyQualifiedNamespace(): ?string
     {
+        if (! $this->vendorNamespace || ! $this->appNamespace) {
+            return null;
+        }
+
         return "{$this->vendorNamespace}\\{$this->appNamespace}";
     }
 

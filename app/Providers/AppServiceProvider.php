@@ -3,6 +3,7 @@
 namespace Inmanturbo\Tandem\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Inmanturbo\Tandem\Console\Commands\TandemCommand;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                TandemCommand::class,
+            ]);
+        }
     }
 }

@@ -4,10 +4,10 @@ namespace Inmanturbo\Tandem\Actions;
 
 class InvokeHandleTandem
 {
-    public function __invoke(HandleTandem $handleTandem): void
+    public function __invoke(HandleTandem $action): void
     {
-        foreach ($handleTandem->handlers as $handler) {
-            app(get_class($handler))($handleTandem->tandem);
+        foreach ($action->handlers as $action) {
+            app(get_class($action))($action->tandem);
         }
     }
 }

@@ -7,7 +7,7 @@ class InvokeFindReplaceInFiles
     /**
      * Invoke the class instance.
      */
-    public function __invoke(FindAndReplaceInFiles ...$actions): void
+    public function __invoke(SearchAndReplaceInFiles|FindAndReplaceInFiles ...$actions): void
     {
         foreach ($actions as $action) {
             foreach ($action->find() as $file) {

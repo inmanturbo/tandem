@@ -30,16 +30,16 @@ class TandemCommand extends Command
      */
     public function handle(): int
     {
-        Event::listen('*.info', function($events, $payload) {
-            $this->output->write(implode($payload));
+        Event::listen('*.info', function ($events, $payload): void {
+            $this->output->write(implode('', $payload));
         });
 
-        Event::listen('*.error', function($events, $payload) {
-            $this->error($events.': '.implode($payload));
+        Event::listen('*.error', function (string $events, $payload): void {
+            $this->error($events.': '.implode('', $payload));
         });
 
-        Event::listen('*.warn', function($events, $payload) {
-            $this->warn($events.': '.implode($payload));
+        Event::listen('*.warn', function (string $events, $payload): void {
+            $this->warn($events.': '.implode('', $payload));
         });
 
         app(TandemCommandHandler::class)(new Tandem(

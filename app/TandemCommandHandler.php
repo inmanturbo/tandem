@@ -7,7 +7,7 @@ use Inmanturbo\Tandem\Actions\InvokeHandleTandem;
 
 class TandemCommandHandler implements HandlesTandem
 {
-    protected function handlers():array
+    protected function handlers(): array
     {
         return [
             new EnsureTandemRepositoryPathExists,

@@ -31,7 +31,7 @@ class TandemCommand extends Command
     public function handle(): int
     {
         Event::listen('*.info', function($events, $payload) {
-            $this->info($events.': '.implode($payload));
+            $this->output->write(implode($payload));
         });
 
         Event::listen('*.error', function($events, $payload) {

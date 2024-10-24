@@ -33,12 +33,6 @@ class RunComposerCommandsInTandem implements HandlesTandem
     {
         return [
             [
-                'require',
-                '--dev',
-                'rector/rector',
-                'phpstan/phpstan',
-            ],
-            [
                 'config',
                 'repositories.mod',
                 $repositoryConfig = json_encode([
